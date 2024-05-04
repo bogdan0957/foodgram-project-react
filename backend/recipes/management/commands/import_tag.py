@@ -1,7 +1,7 @@
 import json
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from recipes.models import Ingredient
+from recipes.models import Tag
 
 
 class Command(BaseCommand):
@@ -9,11 +9,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            path = self.BASE_DIR / 'data/ingredients.json'
+            path = self.BASE_DIR / 'data/tag.json'
             with open(path, 'r', encoding='utf-8-sig') as file:
                 data = json.load(file)
                 for item in data:
-                    Ingredient.objects.get_or_create(**item)
+                    Tag.objects.get_or_create(**item)
         except CommandError as error:
             raise CommandError from error
-        self.stdout.write(self.style.SUCCESS('База данных ingredient пополненна'))
+        self.stdout.write(self.style.SUCCESS('База данных tag пополненна'))

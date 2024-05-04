@@ -14,6 +14,7 @@ class UserAdmin(admin.ModelAdmin):
                     )
     search_fields = ('username', 'first_name', 'last_name',)
     list_display_links = ('username',)
+    verbose_name = 'Пользователи'
 
 
 admin.site.register(User, UserAdmin)
