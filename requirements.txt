@@ -24,6 +24,7 @@ oauthlib==3.2.2
 packaging==23.2
 platformdirs==4.2.0
 pluggy==0.13.1
+Pillow==10.3.0
 py==1.11.0
 pycodestyle==2.11.1
 pycparser==2.22

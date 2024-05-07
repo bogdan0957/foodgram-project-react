@@ -88,10 +88,6 @@ class Favorites(models.Model):
         related_name='favorites',
         verbose_name='Пользователь')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'user'], name='userfavorites_unique')]
 
 
 class ShoppingCart(models.Model):

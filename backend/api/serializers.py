@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from rest_framework import serializers, status
 from rest_framework import serializers
@@ -40,6 +41,13 @@ class IngredientForRecipe(serializers.ModelSerializer):
         fields = (
             'id', 'amount'
         )
+
+    def validate_id(self, value):
+        if not Ingredient.objects.filter(id=value).exists():
+            raise serializers.ValidationError(
+                "Ингредиент с данным id не существует."
+            )
+        return value
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -160,28 +168,51 @@ class NotDetailRecipeSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
+    email = serializers.ReadOnlyField(source="author.email")
+    id = serializers.ReadOnlyField(source="author.id")
+    username = serializers.ReadOnlyField(source="author.username")
+    first_name = serializers.ReadOnlyField(source="author.first_name")
+    last_name = serializers.ReadOnlyField(source="author.last_name")
+    is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Follow
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name', 'is_subscribed', 'recipes', 'recipes_count',
-                  )
+        fields = [
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipes",
+            "recipes_count",
+        ]
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        recipes_limit = request.query_params.get('recipes_limit')
-        recipes = obj.recipes.all()
+        recipes_limit = request.GET.get('recipes_limit')
+        queryset = RecipeList.objects.filter(author=obj.author)
         if recipes_limit:
-            recipes = recipes[:int(recipes_limit)]
-        serializer = NotDetailRecipeSerializer(
-            recipes,
-            many=True,
-            allow_null=True,
-        )
-        return serializer.data
+            queryset = queryset[:int(recipes_limit)]
+        return FollowSerializer(queryset, many=True).data
 
+
+class FollowMakeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ('user', 'author')
+
+    def validate(self, attrs):
+        user = attrs['user']
+        author = attrs['author']
+
+        if user.author.filter(author=author).exists():
+           raise serializers.ValidationError(
+               'Подписан'
+           )
+        return attrs
 
 class RecipelistSerializer(serializers.ModelSerializer):
     author = UserGetSerializer(read_only=True)
@@ -218,7 +249,6 @@ class RecipelistSerializer(serializers.ModelSerializer):
 
 
 class RecipeForSerializer(serializers.ModelSerializer):
-    # author = UserGetSerializer(read_only=True)
     ingredients = IngredientForRecipe(many=True)
     image = Base64ImageField()
     tags = serializers.PrimaryKeyRelatedField(
@@ -296,17 +326,25 @@ class RecipeForSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        ingredients_data = validated_data.pop('ingredients')
-        tags_data = validated_data.pop('tags')
-        if tags_data is not None:
-            instance.tags.clear()
-            instance.tags.set(tags_data)
-        if ingredients_data is not None:
-            instance.ingredients.clear()
-            self.create_and_update_logic(
-                ingredients_data,
-                recipe=instance,
+        if 'ingredients' in validated_data:
+            ingredients_data = validated_data.pop('ingredients')
+        else:
+            raise serializers.ValidationError(
+                'Поле ingredients отсутствует!'
             )
+        if 'tags' in validated_data:
+            tags_data = validated_data.pop('tags')
+        else:
+            raise serializers.ValidationError(
+                'Поле tags отсутствует!'
+            )
+        instance.tags.clear()
+        instance.tags.set(tags_data)
+        instance.ingredients.clear()
+        self.create_and_update_logic(
+            ingredients_data,
+            recipe=instance,
+        )
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
