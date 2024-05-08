@@ -3,20 +3,17 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from djoser.views import UserViewSet
-from datetime import date
 
-from typing_extensions import Self
 
 from users.models import User, Follow
 from recipes.models import RecipeList, Ingredient, Tag
 from .serializers import (RecipelistSerializer, IngredientSerializer,
-                          TagSerializer, UserGetSerializer,
+                          TagSerializer,
                           UserCreateSerializer, RecipeForSerializer,
-                          RecipesBriefSerializer, FollowSerializer,
+                          FollowSerializer,
                           FollowMakeSerializer)
 from .filters import IngredientSearchFilter, TagFilter
 from .permissions import IsAuthorOrAuthOrReadOnly
@@ -42,10 +39,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'tags', 'ingredients').select_related('author')
         return queryset
 
-    # def perform_create(self, serializer):
-    #     serializer.save(author=self.request.user)
-    #     self.request.user.save()
-
 
 class UserCustomViewSet(UserViewSet):
     queryset = User.objects.all()
@@ -60,11 +53,9 @@ class UserCustomViewSet(UserViewSet):
 
     @action(detail=False,
             methods=['get'],
-            url_path='subscriptions',
             permission_classes=[IsAuthenticated])
-    def subscriptions(self: Self, request: Request):
-        user = request.user
-        subscriptions = User.objects.filter(following__user=user)
+    def subscriptions(self, request):
+        subscriptions = User.objects.filter(following__user=self.request.user)
         page = self.paginate_queryset(subscriptions)
         serializer = FollowSerializer(
             page,
@@ -73,6 +64,20 @@ class UserCustomViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    def subscribe(self, request, id):
+        user = request.user
+        following = get_object_or_404(User, pk=id)
+        if request.method == 'POST':
+            serializer = FollowMakeSerializer(data={'user': user.id,
+                                                    'following': following.id})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'DELETE':
+            serializer = get_object_or_404(Follow, user=user, following=following)
+            serializer.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
@@ -87,33 +92,3 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     pagination_class = None
     permission_classes = [IsAuthenticatedOrReadOnly]
-
-
-class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
-    serializer_class = UserGetSerializer
-    permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['get'], url_path='subscriptions',
-            url_name='list_subscriptions')
-    def subscriptions(self, request):
-        queryset = Follow.objects.filter(user=request.user)
-        paginator = LimitOffsetPagination
-        paginated_queryset = paginator.paginate_queryset(queryset, request)
-        serializer = self.get_serializer(paginated_queryset)
-        return paginator.get_paginated_response(serializer.data)
-
-    @action(detail=True, methods=['post', 'delete'], url_path='subscribe')
-    def subscribe(self, request, pk):
-        current_user = self.get_user(pk)
-        serializer = FollowMakeSerializer(data={'author': current_user.id},
-                                          context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        subscription = serializer.save(user=request.user)
-        if request.method == 'POST':
-            return Response(FollowSerializer(
-                subscription, context={'request': request}
-            ).data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
-            subscription.delete()
-            return Response('Подписка удалена', status=status.HTTP_204_NO_CONTENT)
