@@ -86,7 +86,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     )
     password = serializers.CharField(
         write_only=True, required=True,
-        alidators=[
+        validators=[
             MaxLengthValidator(
                 150,
                 message='Длина пароля не должна'

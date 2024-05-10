@@ -11,13 +11,11 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = ('django-insecure-)6)83fa23t^*o5-^'
+              '_9my2x2#hsi*^gy5p7gdat%^$6d%^j9id#')
 
-if os.getenv('DEBUG') == 'True':
-    DEBUG = True
-else:
-    DEBUG = False
-# DEBUG = True
+DEBUG = True
+
 
 ALLOWED_HOSTS = ['foodgramnugmanov.ddns.net', '127.0.0.1',
                  'localhost', '158.160.64.245']
