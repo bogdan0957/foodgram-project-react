@@ -17,7 +17,7 @@ SECRET_KEY = ('django-insecure-)6)83fa23t^*o5-^'
 DEBUG = True
 
 # asdsaaaaaaaaaaaaaaaaadsdadasdasфывыфвфыasdasdas
-ALLOWED_HOSTS = ['foodgramnugmanov.ddns.net', '127.0.0.1',
+ALLOWED_HOSTS = ['foodgrambogdannug.zapto.org', '127.0.0.1',
                  'localhost', '158.160.64.245']
 
 INSTALLED_APPS = [
