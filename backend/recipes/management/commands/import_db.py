@@ -19,4 +19,6 @@ class Command(BaseCommand):
                     Ingredient.objects.get_or_create(**item)
         except CommandError as error:
             raise CommandError from error
-        self.stdout.write(self.style.SUCCESS('База данных ingredient пополненна'))
+        self.stdout.write(self.style.SUCCESS(
+            'База данных ingredient пополненна'
+        ))

@@ -13,14 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECRET_KEY = 'django-insecure-)6)83fa23t^*o5-^_9my2x2#hsi*^gy5p7gdat%^$6d%^j9id#'
 if os.getenv('DEBUG') == 'True':
     DEBUG = True
 else:
     DEBUG = False
 # DEBUG = True
 
-ALLOWED_HOSTS = ['foodgramnugmanov.ddns.net', '127.0.0.1', 'localhost', '158.160.64.245']
+ALLOWED_HOSTS = ['foodgramnugmanov.ddns.net', '127.0.0.1',
+                 'localhost', '158.160.64.245']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -92,16 +92,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.'
+                'NumericPasswordValidator',
     },
 ]
 

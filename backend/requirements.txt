@@ -22,9 +22,10 @@ isort==5.13.2
 mccabe==0.7.0
 oauthlib==3.2.2
 packaging==23.2
+pillow==10.3.0
 platformdirs==4.2.0
 pluggy==0.13.1
-Pillow==10.3.0
+psycopg2==2.9.9
 py==1.11.0
 pycodestyle==2.11.1
 pycparser==2.22
@@ -45,7 +46,7 @@ sqlparse==0.4.4
 toml==0.10.2
 tomli==2.0.1
 tomlkit==0.12.3
+typing==3.7.4.3
 typing_extensions==4.9.0
 tzdata==2024.1
 urllib3==1.26.18
-

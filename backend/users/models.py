@@ -60,8 +60,6 @@ class Follow(models.Model):
         verbose_name_plural = 'Подписки'
         ordering = ('user',)
 
-
     def clean(self):
         if self.user == self.following:
             raise ValidationError('Вы не можете подписаться на себя.')
-

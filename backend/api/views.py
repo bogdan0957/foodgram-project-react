@@ -8,7 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
+                                        IsAuthenticated)
 from rest_framework.response import Response
 
 from recipes.models import (RecipeList, Ingredient, Tag, Favorites,
@@ -44,7 +45,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'tags', 'ingredients').select_related('author')
         return queryset
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
         if request.method == 'POST':
             serializer = FavoriteSerializer(
@@ -64,7 +66,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
         user = request.user
         serializer = ShoppingCartSerializer(data={
@@ -85,7 +88,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=("get",), permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=("get",),
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = self.request.user
         purchases = (
@@ -125,7 +129,8 @@ class UserCustomViewSet(UserViewSet):
             self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
         subscriptions = User.objects.filter(following__user=self.request.user)
         page = self.paginate_queryset(subscriptions)
@@ -136,7 +141,8 @@ class UserCustomViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
         user = request.user
         following = get_object_or_404(User, pk=id)

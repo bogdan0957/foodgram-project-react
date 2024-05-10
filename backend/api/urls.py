@@ -19,4 +19,3 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('', include(router_v1.urls))
 ]
-

@@ -68,25 +68,30 @@ class UserCreateSerializer(serializers.ModelSerializer):
         validators=[
             UniqueValidator(queryset=User.objects.all()),
             MaxLengthValidator(254,
-                               message='Длина email не должна быть больше чем 254 символа.'
+                               message='Длина email не должна быть больше '
+                                       'чем 254 символа.'
                                ),
         ],
     )
     username = serializers.CharField(
         validators=[
-            UniqueValidator(queryset=User.objects.all()), RegexValidator(regex=r"^[\w.@+-]+$", ),
+            UniqueValidator(queryset=User.objects.all()),
+            RegexValidator(regex=r"^[\w.@+-]+$", ),
             MaxLengthValidator(
                 150,
-                message='Длина username не должна быть больше чем 254 символа.'),
+                message='Длина username не должна быть '
+                        'больше чем 254 символа.'),
 
         ]
     )
-    password = serializers.CharField(write_only=True, required=True, validators=[
+    password = serializers.CharField(
+        write_only=True, required=True,
+        alidators=[
             MaxLengthValidator(
                 150,
-                message=f"Длина пароля не должна"
-                        f"превышать 150"
-                        f"символов."
+                message='Длина пароля не должна'
+                        'превышать 150'
+                        'символов.'
             ),
         ],
 
@@ -207,7 +212,8 @@ class RecipeIngredientAmountSerializer(serializers.ModelSerializer):
 class RecipelistSerializer(serializers.ModelSerializer):
     author = UserGetSerializer(read_only=True)
     tags = TagSerializer(many=True)
-    ingredients = RecipeIngredientAmountSerializer(many=True, source='ingredientrecipes')
+    ingredients = RecipeIngredientAmountSerializer(many=True,
+                                                   source='ingredientrecipes')
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -241,7 +247,9 @@ class RecipelistSerializer(serializers.ModelSerializer):
 class RecipeForSerializer(serializers.ModelSerializer):
     ingredients = IngredientForRecipe(many=True)
     image = Base64ImageField()
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
+    )
 
     class Meta:
         model = RecipeList

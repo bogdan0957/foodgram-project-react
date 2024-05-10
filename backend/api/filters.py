@@ -50,4 +50,3 @@ class RecipeFilter(FilterSet):
     class Meta:
         model = RecipeList
         fields = ("author", "tags")
-
