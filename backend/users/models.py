@@ -1,11 +1,13 @@
+"""
+Модели.
+"""
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_slug
 from django.db import models
-from django.db.models import Q, F
 
 
 class User(AbstractUser):
+    """Кастомная модель пользователя."""
     username = models.CharField(
         'Уникальный юзернейм',
         max_length=150,
@@ -28,8 +30,6 @@ class User(AbstractUser):
         'Пароль',
         max_length=150
     )
-    # USERNAME_FIELD = 'username'
-    # REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'пользователь'
@@ -40,6 +40,7 @@ class User(AbstractUser):
 
 
 class Follow(models.Model):
+    """Модель отслеживания."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -58,16 +59,7 @@ class Follow(models.Model):
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         ordering = ('user',)
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'following'],
-                name='unique_subscription_fields'
-            ),
-            models.CheckConstraint(
-                check=~Q(user=F('following')),
-                name='self_subscription'
-            )
-        ]
+
 
     def clean(self):
         if self.user == self.following:

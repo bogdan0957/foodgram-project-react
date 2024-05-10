@@ -1,5 +1,6 @@
-import os
-from datetime import timedelta
+"""
+Настройки проекта.
+"""
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -103,9 +104,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
-    'DEFAULT_PAGINATION_CLASS':
-        'rest_framework.pagination.PageNumberPagination',
-        'PAGE_SIZE': 6,
 }
 
 DJOSER = {
@@ -122,14 +120,3 @@ DJOSER = {
     'HIDE_USERS': False,
 }
 AUTH_USER_MODEL = 'users.User'
-
-MAX_NAME_LENGTH = 30
-MAX_TEXT_LENGTH = 30
-FIELD_NAME_LENGTH = 254
-USERNAME_MAX_LENGTH = 150
-EMAIL_MAX_LENGTH = 254
-AUTH_EMAIL = 'auth@finalproject.ru'
-MAX_REVIEW_TEXT = 500
-MIN_YEAR_REALISE = -4000
-MIN_SCORE = 1
-MAX_SCORE = 10

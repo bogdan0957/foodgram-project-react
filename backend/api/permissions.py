@@ -1,6 +1,11 @@
+"""
+Пермишены.
+"""
 from rest_framework.permissions import BasePermission
 
+
 class IsAuthorOrAuthOrReadOnly(BasePermission):
+    """Пермишены для запрета определеных действий."""
 
     def has_permission(self, request, view):
         if request.method == 'POST':

@@ -1,9 +1,13 @@
+"""
+Модели.
+"""
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from users.models import User
 
 
 class Tag(models.Model):
+    """Модель тэгов."""
     name = models.CharField(max_length=200, unique=True)
     color = models.CharField(max_length=7, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
@@ -17,6 +21,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """Модель ингредиентов."""
     name = models.CharField(max_length=200)
     measurement_unit = models.CharField(max_length=200)
 
@@ -30,6 +35,7 @@ class Ingredient(models.Model):
 
 
 class RecipeList(models.Model):
+    """Модель рецепта."""
     tags = models.ManyToManyField(Tag, verbose_name='Список тегов', related_name='recipes')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор', related_name='recipes')
     ingredients = models.ManyToManyField(Ingredient, verbose_name='Список ингредиентов', related_name='recipes')
@@ -49,9 +55,10 @@ class RecipeList(models.Model):
 
 
 class IngredientRecipe(models.Model):
+    """Модель ингредиентов в рецепте."""
     recipes = models.ForeignKey(RecipeList, on_delete=models.CASCADE, related_name='ingredientrecipes', )
     ingredients = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='ingredientrecipes')
-    amount = models.PositiveSmallIntegerField('Количество', validators=[MaxValueValidator(1000),
+    amount = models.SmallIntegerField('Количество', validators=[MaxValueValidator(1000),
                                                                         MinValueValidator(1)])
 
     class Meta:
@@ -61,7 +68,7 @@ class IngredientRecipe(models.Model):
 
 
 class RecipeTag(models.Model):
-    """Промежуточная модель для связи рецепта и тега."""
+    """Модель тэгов в рецепте."""
     recipe = models.ForeignKey(
         RecipeList,
         on_delete=models.CASCADE)
@@ -76,7 +83,7 @@ class RecipeTag(models.Model):
 
 
 class Favorites(models.Model):
-    """Модель избранного."""
+    """Модель отслеживания."""
     recipe = models.ForeignKey(
         RecipeList,
         on_delete=models.CASCADE,
@@ -91,7 +98,7 @@ class Favorites(models.Model):
 
 
 class ShoppingCart(models.Model):
-    """Модель продуктовой корзины."""
+    """Модель списка продуктов."""
     recipe = models.ForeignKey(
         RecipeList,
         on_delete=models.CASCADE,
@@ -103,8 +110,6 @@ class ShoppingCart(models.Model):
         related_name='shopping_cart',
         verbose_name='Пользователь')
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'user'], name='usershoppingcart_unique')]
+
+
 

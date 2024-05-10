@@ -1,10 +1,12 @@
+"""
+Админ-зона для Пользователя.
+"""
 from django.contrib import admin
 
 from users.models import User
 
 
 class UserAdmin(admin.ModelAdmin):
-    """Представление модели User."""
 
     list_display = ('id',
                     'username',

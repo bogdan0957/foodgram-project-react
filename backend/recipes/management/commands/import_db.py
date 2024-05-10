@@ -1,3 +1,6 @@
+"""
+Команда для импорта ингредиентов в базу данных.
+"""
 import json
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
