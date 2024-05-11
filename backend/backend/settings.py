@@ -11,14 +11,16 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = ('django-insecure-)6)83fa23t^*o5-^'
-              '_9my2x2#hsi*^gy5p7gdat%^$6d%^j9id#')
+SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_KEY')
 
-DEBUG = True
+if os.getenv('DEBUG') == 'True':
+    DEBUG = True
+else:
+    DEBUG = False
 
-# asdsaaaaaaaaaaaaaaaaadsdadasdasфывыфвфыasdasdas
-ALLOWED_HOSTS = ['foodgrambogdannug.zapto.org', '127.0.0.1',
-                 'localhost', '158.160.64.245']
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS',default='127.0.0.1, localhost'
+).split(' ')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,8 +68,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# if os.getenv('DATABASE') == 'Production':
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -78,15 +78,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', 5432)
     }
 }
-# else:
-#
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -119,7 +110,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
