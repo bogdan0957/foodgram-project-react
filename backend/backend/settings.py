@@ -38,7 +38,7 @@ INSTALLED_APPS = [
 
 ]
 
-#SADASDASDASDSA
+# SDASDASDA
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
