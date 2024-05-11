@@ -38,7 +38,6 @@ INSTALLED_APPS = [
 
 ]
 
-# SDASDASDA
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -145,3 +144,5 @@ DJOSER = {
     'HIDE_USERS': False,
 }
 AUTH_USER_MODEL = 'users.User'
+
+CSRF_TRUSTED_ORIGINS = ['https://foodgrambogdannug.zapto.org']
