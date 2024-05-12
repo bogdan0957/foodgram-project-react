@@ -1,2 +1,2 @@
-Адрес сайтаЖ
+Адрес сайта:/
 foodgrambogdannug.zapto.org
