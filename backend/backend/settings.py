@@ -13,13 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='SECRET_KEY')
 
-if os.getenv('DEBUG') == 'True':
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS', default='127.0.0.1, localhost'
+    'ALLOWED_HOSTS', default='127.0.0.1 localhost'
 ).split(' ')
 
 INSTALLED_APPS = [
@@ -35,7 +32,6 @@ INSTALLED_APPS = [
     'api',
     'recipes',
     'users',
-
 ]
 
 
@@ -80,6 +76,7 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -133,7 +130,6 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserGetSerializer',
         'current_user': 'api.serializers.UserGetSerializer',
     },

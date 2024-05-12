@@ -3,9 +3,9 @@
 """
 from django.contrib import admin
 
-from users.models import User
+from users.models import User, Follow
 
-
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
 
     list_display = ('id',
@@ -19,4 +19,10 @@ class UserAdmin(admin.ModelAdmin):
     verbose_name = 'Пользователи'
 
 
-admin.site.register(User, UserAdmin)
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('user', 'following')
+    search_fields = ('user', 'following')
+    list_display_links = ('user',)
+    verbose_name = 'Отслеживание'
+

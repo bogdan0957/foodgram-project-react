@@ -30,6 +30,8 @@ class User(AbstractUser):
         'Пароль',
         max_length=150
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         verbose_name = 'пользователь'
@@ -54,11 +56,15 @@ class Follow(models.Model):
         verbose_name='Автор'
 
     )
-
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         ordering = ('user',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "following"), name="unique_follow"
+            )
+        ]
 
     def clean(self):
         if self.user == self.following:

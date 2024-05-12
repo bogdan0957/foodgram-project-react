@@ -12,7 +12,7 @@ from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
 from rest_framework.response import Response
 
-from recipes.models import (RecipeList, Ingredient, Tag, Favorites,
+from recipes.models import (Recipe, Ingredient, Tag, Favorites,
                             ShoppingCart, IngredientRecipe)
 from users.models import User
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -27,7 +27,6 @@ from .serializers import (RecipelistSerializer, IngredientSerializer,
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """ViewSet для рецептов."""
-    queryset = RecipeList.objects.all()
     serializer_class = RecipelistSerializer
     permission_classes = [IsAuthorOrAuthOrReadOnly]
     pagination_class = LimitPagination
@@ -41,7 +40,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeForSerializer
 
     def get_queryset(self):
-        queryset = RecipeList.objects.all().prefetch_related(
+        queryset = Recipe.objects.all().prefetch_related(
             'tags', 'ingredients').select_related('author')
         return queryset
 
@@ -59,8 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             get_object_or_404(Favorites, recipe_id=pk)
             favorite_with_empty_variable, _ = Favorites.objects.filter(
-                user__id=request.user.id,
-                recipe__id=pk
+                user__id=request.user.id
             ).delete()
             if favorite_with_empty_variable:
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -81,38 +79,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'DELETE':
             get_object_or_404(ShoppingCart, recipe_id=pk)
             shopping_cart_with_empty_variable, _ = ShoppingCart.objects.filter(
-                user__id=request.user.id,
-                recipe__id=pk
+                user__id=request.user.id
             ).delete()
             if shopping_cart_with_empty_variable:
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=("get",),
+    @action(detail=False, methods=('get',),
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         user = self.request.user
         purchases = (
-            IngredientRecipe.objects.filter(recipes__shopping_cart__user=user)
-            .values("ingredients")
-            .annotate(amount=Sum("amount"))
+            IngredientRecipe.objects.filter(recipe__shopping_cart__user=user)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(amount=Sum('amount'))
         )
         ingredient_list = [
-            "Список необходимых ингредиентов:",
+            'Список необходимых ингредиентов:',
         ]
         for el in purchases:
-            ingredient = Ingredient.objects.get(pk=el["ingredients"])
-            amount = el["amount"]
+            # ingredient = Ingredient.objects.get(pk=el['ingredient'])
             ingredient_list.append(
-                f" • {ingredient.name}: {amount} "
-                f"{ingredient.measurement_unit}"
+                f' • {el["ingredient__name"]}: {el["amount"]} '
+                f'{el["ingredient__measurement_unit"]}'
             )
-        file = "\n".join(ingredient_list)
+        file = '\n'.join(ingredient_list)
 
-        response = HttpResponse(file, content_type="text/plain")
+        response = HttpResponse(file, content_type='text/plain')
         response[
-            "Content-Disposition"
-        ] = "attachment; filename=IngredientList.txt"
+            'Content-Disposition'
+        ] = 'attachment; filename=IngredientList.txt'
 
         return response
 

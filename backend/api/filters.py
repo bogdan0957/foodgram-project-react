@@ -6,8 +6,7 @@ from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework import filters
 from rest_framework.filters import SearchFilter
 
-from recipes.models import Ingredient, RecipeList, Tag
-from users.models import User
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class IngredientSearchFilter(SearchFilter):
@@ -28,12 +27,15 @@ class RecipeFilter(FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         method="in_shopping_cart_method"
     )
-    author = filters.ModelChoiceFilter(queryset=User.objects.all())
     tags = ModelMultipleChoiceFilter(
         field_name="tags__slug",
         to_field_name="slug",
         queryset=Tag.objects.all(),
     )
+
+    class Meta:
+        model = Recipe
+        fields = ("author", "tags")
 
     def favorited_method(self, queryset, name, value):
 
@@ -47,6 +49,4 @@ class RecipeFilter(FilterSet):
             return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
 
-    class Meta:
-        model = RecipeList
-        fields = ("author", "tags")
+
