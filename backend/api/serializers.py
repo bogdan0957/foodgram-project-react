@@ -126,9 +126,9 @@ class UserGetSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return (request
-            and request.user.is_authenticated
-            and request.user.follower.filter(user=obj).exists()
-        )
+                and request.user.is_authenticated
+                and request.user.follower.filter(user=obj).exists()
+                )
 
 
 class ViewRecipeSerializer(serializers.ModelSerializer):
@@ -333,45 +333,6 @@ class RecipeForSerializer(serializers.ModelSerializer):
             context={'request': self.context.get('request')},
         )
         return serializer.data
-
-
-# class FavoriteAndShoppingCartSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         fields = ('user', 'recipe')
-#
-#     def validate(self, attrs):
-#         recipe = attrs['recipe']
-#         user = attrs['user']
-#         obj = user.favorites.filter(recipe=recipe)
-#         if self.context['request'].method == 'POST':
-#             if obj.exists():
-#                 raise serializers.ValidationError('Уже в избранном!')
-#         if self.context['request'].method == 'DELETE':
-#             if not obj.exists():
-#                 raise serializers.ValidationError(
-#                     'Рецепта нет в избранном')
-#         return attrs
-#
-#     def to_representation(self, instance):
-#         serializer = ViewRecipeSerializer(
-#             instance.recipe,
-#             context={'request': self.context.get('request')}
-#         )
-#         return serializer.data
-#
-#
-# class FavoriteSerializer(FavoriteAndShoppingCartSerializer):
-#     class Meta:
-#         fields = ('user', 'recipe')
-#         model = Favorites
-#
-#
-# class ShoppingCartSerializer(FavoriteAndShoppingCartSerializer):
-#     class Meta:
-#         fields = ('user', 'recipe')
-#         model = ShoppingCart
-
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

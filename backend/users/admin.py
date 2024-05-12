@@ -5,9 +5,9 @@ from django.contrib import admin
 
 from users.models import User, Follow
 
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-
     list_display = ('id',
                     'username',
                     'email',
@@ -25,4 +25,3 @@ class FollowAdmin(admin.ModelAdmin):
     search_fields = ('user', 'following')
     list_display_links = ('user',)
     verbose_name = 'Отслеживание'
-
