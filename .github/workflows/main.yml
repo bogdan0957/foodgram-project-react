@@ -1,4 +1,4 @@
-name: Main Kittygram workflow
+name: Main Foodgram workflow
 
 on:
   push:
@@ -54,13 +54,8 @@ jobs:
         with:
           context: ./backend/
           push: true
-          tags: bogdan0957/kittygram_backend:latest
-      - name: Push to Docker Hub Frontend
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          context: ./frontend/
-          tags: bogdan0957/foodgram_frontend:latest
+          tags: bogdan0957/foodgram_backend:latest
+
 
   deploy:
     runs-on: ubuntu-latest
