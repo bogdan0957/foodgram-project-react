@@ -11,7 +11,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from recipes.models import (Recipe, Ingredient, Tag,
-                            IngredientRecipe, Favorites,
+                            IngredientRecipe, Favorite,
                             ShoppingCart)
 from users.models import User, Follow
 from backend import constants
@@ -40,6 +40,11 @@ class WriteIngredientInRecipe(serializers.ModelSerializer):
         fields = (
             'id', 'amount',
         )
+
+    def validate_amount(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        
+
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -316,11 +321,11 @@ class RecipeForSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
+        IngredientRecipe.objects.filter(recipe=instance).delete()
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         instance.tags.clear()
         instance.tags.set(tags_data)
-        instance.ingredients.clear()
         self.get_ingredients(
             ingredients_data,
             recipe=instance,
@@ -337,7 +342,7 @@ class RecipeForSerializer(serializers.ModelSerializer):
 
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Favorites
+        model = Favorite
         fields = ('user', 'recipe')
 
     def validate(self, attrs):

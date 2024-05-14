@@ -3,7 +3,7 @@
 """
 from django.contrib import admin
 from .models import (Ingredient, Tag, Recipe, IngredientRecipe,
-                     ShoppingCart, Favorites)
+                     ShoppingCart, Favorite)
 
 
 @admin.register(Recipe)
@@ -33,7 +33,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
     search_fields = ('user',)
 
 
-@admin.register(Favorites)
+@admin.register(Favorite)
 class FavouriteAdmin(admin.ModelAdmin):
     list_display = ('user', 'recipe')
     search_fields = ('user',)

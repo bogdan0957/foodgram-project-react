@@ -12,7 +12,7 @@ from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
                                         IsAuthenticated)
 from rest_framework.response import Response
 
-from recipes.models import (Recipe, Ingredient, Tag, Favorites,
+from recipes.models import (Recipe, Ingredient, Tag, Favorite,
                             ShoppingCart, IngredientRecipe)
 from users.models import User
 from .filters import IngredientSearchFilter, RecipeFilter
@@ -41,7 +41,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Recipe.objects.all().prefetch_related(
-            'tags', 'ingredients').select_related('author')
+            'tags').select_related('author')
         return queryset
 
     @action(detail=True, methods=['post', 'delete'],
@@ -56,8 +56,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            get_object_or_404(Favorites, recipe_id=pk)
-            favorite_with_empty_variable, _ = Favorites.objects.filter(
+            get_object_or_404(Favorite, recipe_id=pk)
+            favorite_with_empty_variable, _ = Favorite.objects.filter(
                 user__id=request.user.id
             ).delete()
             if favorite_with_empty_variable:

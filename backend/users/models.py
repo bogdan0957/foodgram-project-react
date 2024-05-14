@@ -5,30 +5,32 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from backend import constants
+
 
 class User(AbstractUser):
     """Кастомная модель пользователя."""
     username = models.CharField(
         'Уникальный юзернейм',
-        max_length=150,
+        max_length=constants.USER_USERNAME_MAX_LENGHT,
         unique=True
     )
     email = models.EmailField(
         'Адрес электронной почты',
-        max_length=254,
+        max_length=constants.USER_EMAIL_MAX_LENGHT,
         unique=True
     )
     first_name = models.CharField(
         'Имя',
-        max_length=150
+        max_length=constants.USER_FIRST_NAME_MAX_LENGHT
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=150
+        max_length=constants.USER_LAST_NAME_MAX_LENGHT
     )
     password = models.CharField(
         'Пароль',
-        max_length=150
+        max_length=constants.USER_PASSWORD_MAX_LENGHT
     )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
