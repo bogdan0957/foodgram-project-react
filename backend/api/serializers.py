@@ -43,7 +43,7 @@ class WriteIngredientInRecipe(serializers.ModelSerializer):
 
     def validate_amount(self, data):
         ingredients = self.initial_data.get('ingredients')
-        
+
 
 
 
