@@ -20,7 +20,7 @@ from .pagination import LimitPagination
 from .permissions import IsAuthorOrAuthOrReadOnly
 from .serializers import (RecipelistSerializer, IngredientSerializer,
                           TagSerializer, FavoriteSerializer,
-                          UserCreateSerializer, RecipeForSerializer,
+                          UserCreateSerializer, RecipeCreateSerializer,
                           FollowSerializer, ShoppingCartSerializer,
                           FollowMakeSerializer)
 
@@ -37,7 +37,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in ('list'):
             return RecipelistSerializer
         else:
-            return RecipeForSerializer
+            return RecipeCreateSerializer
 
     def get_queryset(self):
         queryset = Recipe.objects.all().prefetch_related(
