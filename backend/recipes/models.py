@@ -92,9 +92,9 @@ class IngredientRecipe(models.Model):
         'Количество',
         validators=[MaxValueValidator(
             constants.INGREDIENTRECIPE_AMOUNT_MAX_VALIDATOR
-        ),
-                    MinValueValidator(
-                        constants.INGREDIENTRECIPE_AMOUNT_MIN_VALIDATOR)])
+        ), MinValueValidator(
+            constants.INGREDIENTRECIPE_AMOUNT_MIN_VALIDATOR)]
+    )
 
     class Meta:
         verbose_name = 'Ингридиент для рецепта'
@@ -133,6 +133,7 @@ class FavoriteShoppingCart(models.Model):
 
 class Favorite(FavoriteShoppingCart):
     """Модель отслеживания."""
+
     class Meta:
         default_related_name = 'favorites'
         verbose_name = 'Избранное'
@@ -150,6 +151,7 @@ class Favorite(FavoriteShoppingCart):
 
 class ShoppingCart(FavoriteShoppingCart):
     """Модель списка продуктов."""
+
     class Meta:
         default_related_name = 'shopping_cart'
         verbose_name = 'Список продуктов'

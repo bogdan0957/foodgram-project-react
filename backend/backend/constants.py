@@ -17,4 +17,3 @@ USER_LAST_NAME_MAX_LENGHT = 150
 USER_USERNAME_MAX_LENGHT = 150
 """Константы для Проверки на дубликат."""
 INTEGER_FOR_NOT_DUPLICATE = 1
-
