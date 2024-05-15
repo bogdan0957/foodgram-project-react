@@ -9,7 +9,7 @@ from django.core.validators import (MaxLengthValidator, RegexValidator,
 from django.db import transaction
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from backend import constants
 from recipes.models import (Recipe, Ingredient, Tag,
@@ -366,49 +366,45 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class FavoriteAndShoppingCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        abstract = True
+        fields = ('user', 'recipe')
+
+    def to_representation(self, instance):
+        serializer = ViewRecipeSerializer(
+            instance.recipe, context={'request': self.context.get('request')}
+        )
+        return serializer.data
+
+
+class FavoriteSerializer(FavoriteAndShoppingCardSerializer):
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
-
-    def validate(self, attrs):
-        recipe = attrs['recipe']
-        user = attrs['user']
-        obj = user.favorites.filter(recipe=recipe)
-        if self.context['request'].method == 'POST':
-            if obj.exists():
-                raise serializers.ValidationError('Уже в избранном!')
-        if self.context['request'].method == 'DELETE':
-            if not obj.exists():
-                raise serializers.ValidationError('Рецепта нет в избранном')
-        return attrs
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в избранное'
+            )
+        ]
 
     def to_representation(self, instance):
-        serializer = ViewRecipeSerializer(
-            instance.recipe, context={'request': self.context.get('request')}
-        )
-        return serializer.data
+        return super().to_representation(instance)
 
 
-class ShoppingCartSerializer(serializers.ModelSerializer):
+class ShoppingCartSerializer(FavoriteAndShoppingCardSerializer):
     class Meta:
         model = ShoppingCart
-        fields = '__all__'
-
-    def validate(self, attrs):
-        recipe = attrs['recipe']
-        user = attrs['user']
-        obj = user.shopping_cart.filter(recipe=recipe)
-        if self.context['request'].method == 'POST':
-            if obj.exists():
-                raise serializers.ValidationError('Уже в корзине!')
-        if self.context['request'].method == 'DELETE':
-            if not obj.exists():
-                raise serializers.ValidationError('Нет в корзине')
-        return attrs
+        fields = ('user', 'recipe')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже добавлен в список покупок'
+            )
+        ]
 
     def to_representation(self, instance):
-        serializer = ViewRecipeSerializer(
-            instance.recipe, context={'request': self.context.get('request')}
-        )
-        return serializer.data
+        return super().to_representation(instance)

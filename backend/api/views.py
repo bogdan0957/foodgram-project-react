@@ -36,13 +36,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ('list'):
             return RecipelistSerializer
-        else:
-            return RecipeCreateSerializer
+        return RecipeCreateSerializer
 
     def get_queryset(self):
-        queryset = Recipe.objects.all().prefetch_related(
+        return Recipe.objects.all().prefetch_related(
             'tags').select_related('author')
-        return queryset
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -55,7 +53,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
+        else:
             get_object_or_404(Favorite, recipe_id=pk)
             favorite_with_empty_variable, _ = Favorite.objects.filter(
                 user__id=request.user.id
@@ -67,16 +65,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
-        user = request.user
         serializer = ShoppingCartSerializer(data={
-            'user': user.id,
+            'user': request.user.id,
             'recipe': pk
         }, context={'request': request})
         if request.method == 'POST':
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
+        else:
             get_object_or_404(ShoppingCart, recipe_id=pk)
             shopping_cart_with_empty_variable, _ = ShoppingCart.objects.filter(
                 user__id=request.user.id
@@ -88,9 +85,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=('get',),
             permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
-        user = self.request.user
         purchases = (
-            IngredientRecipe.objects.filter(recipe__shopping_cart__user=user)
+            IngredientRecipe.objects.filter(
+                recipe__shopping_cart__user=self.request.user)
             .values('ingredient__name', 'ingredient__measurement_unit')
             .annotate(amount=Sum('amount'))
         )
@@ -98,7 +95,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'Список необходимых ингредиентов:',
         ]
         for el in purchases:
-            # ingredient = Ingredient.objects.get(pk=el['ingredient'])
             ingredient_list.append(
                 f' • {el["ingredient__name"]}: {el["amount"]} '
                 f'{el["ingredient__measurement_unit"]}'
@@ -113,7 +109,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class UserCustomViewSet(UserViewSet):
+class UserCreateAndSubscribeViewSet(UserViewSet):
     """ViewSet для Кастомного Пользователя."""
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
@@ -140,17 +136,16 @@ class UserCustomViewSet(UserViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def subscribe(self, request, id):
-        user = request.user
-        following = get_object_or_404(User, pk=id)
         if request.method == 'POST':
-            serializer = FollowMakeSerializer(data={'user': user.id,
-                                                    'following': following.id})
+            serializer = FollowMakeSerializer(
+                data={'user': request.user.id,
+                      'following': get_object_or_404(User, pk=id).id})
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        if request.method == 'DELETE':
-            follow_with_empty_variable, _ = user.follower.filter(
-                following=following
+        else:
+            follow_with_empty_variable, _ = request.user.follower.filter(
+                following=get_object_or_404(User, pk=id)
             ).delete()
             if follow_with_empty_variable:
                 return Response(status=status.HTTP_204_NO_CONTENT)

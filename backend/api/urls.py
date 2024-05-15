@@ -4,13 +4,17 @@
 from django.urls import include, path, re_path
 from rest_framework.routers import SimpleRouter
 
-from api.views import (RecipeViewSet, UserCustomViewSet,
+from api.views import (RecipeViewSet, UserCreateAndSubscribeViewSet,
                        IngredientViewSet, TagViewSet)
 
 router_v1 = SimpleRouter()
 router_v1.register('recipes', RecipeViewSet, basename='recipes')
-router_v1.register('users', UserCustomViewSet, basename='users')
-router_v1.register('ingredients', IngredientViewSet, basename='ingredients')
+router_v1.register(
+    'users', UserCreateAndSubscribeViewSet, basename='users'
+)
+router_v1.register(
+    'ingredients', IngredientViewSet, basename='ingredients'
+)
 router_v1.register('tags', TagViewSet, basename='tags')
 
 
