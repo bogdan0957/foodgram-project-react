@@ -41,13 +41,15 @@ class WriteIngredientInRecipe(serializers.ModelSerializer):
         )
 
     def validate_amount(self, data):
-        if data < constants.INGREDIENTRECIPE_AMOUNT_MIN_VALIDATOR:
+        if data < constants.INGREDIENTRECIPE_AMOUNT_MIN:
             raise serializers.ValidationError(
-                'Количество ингредиентов не может быть меньше 1.'
+                f'Количество ингредиентов не может быть меньше '
+                f'{constants.INGREDIENTRECIPE_AMOUNT_MIN}.'
             )
-        elif data > constants.INGREDIENTRECIPE_AMOUNT_MAX_VALIDATOR:
+        if data > constants.INGREDIENTRECIPE_AMOUNT_MAX:
             raise serializers.ValidationError(
-                'Количество ингредиентов не может быть больше 1000.'
+                f'Количество ингредиентов не может быть больше '
+                f'{constants.INGREDIENTRECIPE_AMOUNT_MAX}.'
             )
 
         return data
@@ -171,7 +173,9 @@ class FollowSerializer(UserGetSerializer):
                 int(recipes_limit)
             except ValueError:
                 raise ValueError(
-                    'Передано не значение'
+                    'Передано не значение, запрос принимает только число!'
+                    'Неправильные данные: "один", "два" и т.д.,'
+                    'Правильные данные: 1, 2, "2", "1" и т.д.'
                 )
             else:
                 recipes = recipes[:int(recipes_limit)]
@@ -288,22 +292,23 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         tags = self.initial_data.get('tags')
-        if len(tags) == constants.INTEGER_FOR_NOT_DUPLICATE:
+        if len(tags) == constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE:
             return data
         is_duplicate_tags = False
         for el in tags:
-            if tags.count(el) > constants.INTEGER_FOR_NOT_DUPLICATE:
+            if tags.count(el) > constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE:
                 is_duplicate_tags = True
         if is_duplicate_tags:
             raise serializers.ValidationError(
                 'Тэги не должны повторятся.'
             )
         ingredients = self.initial_data.get('ingredients')
-        if len(ingredients) == constants.INTEGER_FOR_NOT_DUPLICATE:
+        if len(ingredients) == constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE:
             return data
         is_duplicate_ingredient = False
         for el3 in ingredients:
-            if ingredients.count(el3) > constants.INTEGER_FOR_NOT_DUPLICATE:
+            if (ingredients.count(el3) >
+                    constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE):
                 is_duplicate_ingredient = True
         if is_duplicate_ingredient:
             raise serializers.ValidationError(
@@ -312,11 +317,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return data
 
     def validate_cooking_time(self, data):
-        if data < constants.RECIPE_COOKING_TIME_MIN_VALIDATOR:
+        if data < constants.RECIPE_COOKING_TIME_MIN:
             raise serializers.ValidationError(
                 'Время приготовления не может быть меньше 1 мин.'
             )
-        elif data > constants.RECIPE_COOKING_TIME_MAX_VALIDATOR:
+        elif data > constants.RECIPE_COOKING_TIME_MAX:
             raise serializers.ValidationError(
                 'Время приготовления не может быть больше 100 мин.'
             )
@@ -366,9 +371,20 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class FavoriteAndShoppingCardSerializer(serializers.ModelSerializer):
+    model = None
+    text_exceptions = None
+
     class Meta:
-        abstract = True
         fields = ('user', 'recipe')
+
+    @classmethod
+    def validate(cls, attrs):
+        user = attrs['user']
+        recipe = attrs['recipe']
+        if cls.model.objects.filter(user=user, recipe=recipe):
+            raise serializers.ValidationError(
+                cls.text_exceptions)
+        return attrs
 
     def to_representation(self, instance):
         serializer = ViewRecipeSerializer(
@@ -378,32 +394,18 @@ class FavoriteAndShoppingCardSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(FavoriteAndShoppingCardSerializer):
+    model = 'Favorite'
+    text = 'Рецепт уже в избранном'
+
     class Meta:
         model = Favorite
-        fields = ('user', 'recipe')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Favorite.objects.all(),
-                fields=('user', 'recipe'),
-                message='Рецепт уже добавлен в избранное'
-            )
-        ]
-
-    def to_representation(self, instance):
-        return super().to_representation(instance)
 
 
 class ShoppingCartSerializer(FavoriteAndShoppingCardSerializer):
+    model = 'ShoppingCart'
+    text = 'Рецепт уже в списке продуктов'
+
     class Meta:
         model = ShoppingCart
-        fields = ('user', 'recipe')
-        validators = [
-            UniqueTogetherValidator(
-                queryset=ShoppingCart.objects.all(),
-                fields=('user', 'recipe'),
-                message='Рецепт уже добавлен в список покупок'
-            )
-        ]
 
-    def to_representation(self, instance):
-        return super().to_representation(instance)
+
