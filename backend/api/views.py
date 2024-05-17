@@ -14,7 +14,7 @@ from rest_framework.response import Response
 
 from recipes.models import (Recipe, Ingredient, Tag, Favorite,
                             ShoppingCart, IngredientRecipe)
-from users.models import User
+from users.models import User, Follow
 from .filters import IngredientSearchFilter, RecipeFilter
 from .pagination import LimitPagination
 from .permissions import IsAuthorOrAuthOrReadOnly
@@ -42,8 +42,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Recipe.objects.all().prefetch_related(
             'tags').select_related('author')
 
-    @staticmethod
-    def add_recipe_favorite_or_shopping_card(request, pk, serializers):
+    def add_recipe_favorite_or_shopping_card(self, request, pk, serializers):
         serializer = serializers(
             data={'user': request.user.id,
                   'recipe': pk}, context={'request': request}
@@ -52,12 +51,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @staticmethod
-    def delete_recipe_favorite_or_shopping_card(request, pk, model):
+    def delete_recipe_favorite_or_shopping_card(self, request, pk, model):
         recipe = get_object_or_404(Recipe, pk=pk)
-        object = get_object_or_404(model, user=request.user, recipe=recipe)
-        object.delete()
-        if not object.exists():
+        object = model.objects.filter(user=request.user, recipe=recipe)
+        if object.exists():
+            object.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,13 +142,12 @@ class UserCreateAndSubscribeViewSet(UserViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            follow_with_empty_variable, _ = request.user.follower.filter(
-                following=get_object_or_404(User, pk=id)
-            ).delete()
-            if follow_with_empty_variable:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        following = get_object_or_404(User, pk=id)
+        object = Follow.objects.filter(user=request.user, following=following)
+        if object.exists():
+            object.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):

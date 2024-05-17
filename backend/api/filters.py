@@ -23,19 +23,19 @@ class RecipeFilter(FilterSet):
     Фильтр для поиска по полю 'is_favorited', 'is_in_shopping_cart',
     'author', 'tags' в RecipeViewSet.
     """
-    is_favorited = filters.BooleanFilter(method="favorited_method")
+    is_favorited = filters.BooleanFilter(method='favorited_method')
     is_in_shopping_cart = filters.BooleanFilter(
-        method="in_shopping_cart_method"
+        method='in_shopping_cart_method'
     )
     tags = ModelMultipleChoiceFilter(
-        field_name="tags__slug",
-        to_field_name="slug",
+        field_name='tags__slug',
+        to_field_name='slug',
         queryset=Tag.objects.all(),
     )
 
     class Meta:
         model = Recipe
-        fields = ("author", "tags")
+        fields = ('author', 'tags')
 
     def favorited_method(self, queryset, name, value):
 
