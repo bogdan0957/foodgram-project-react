@@ -279,8 +279,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             return data
         is_duplicate = False
         for el in object:
-            if (object.count(el) >
-                    constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE):
+            if (object.count(el)
+                    > constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE):
                 is_duplicate = True
         if is_duplicate:
             raise serializers.ValidationError(
