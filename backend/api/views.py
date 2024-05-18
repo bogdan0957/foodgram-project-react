@@ -42,7 +42,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Recipe.objects.all().prefetch_related(
             'tags').select_related('author')
 
-    def add_recipe_favorite_or_shopping_card(self, request, pk, serializer_data):
+    def add_recipe_favorite_or_shopping_card(
+            self, request, pk, serializer_data
+    ):
         serializer = serializer_data(
             data={'user': request.user.id,
                   'recipe': pk}, context={'request': request}
