@@ -1,5 +1,7 @@
 # ПРОЕКТ ФУДГРАММ. 
 
+![example workflow](https://github.com/bogdan0957/foodgram-project-react/.github/workflows/main.yml/badge.svg)
+
 ## Проект "Проект Фудграм" разработан на языке программирования Python, с использованием фреймворка Django и библиотеки Django REST framework.
 
 ### Описание проекта:
