@@ -69,6 +69,9 @@ class Follow(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f'Пользователь {self.user} подписался на {self.following}'
+
     def clean(self):
         if self.user == self.following:
             raise ValidationError('Вы не можете подписаться на себя.')

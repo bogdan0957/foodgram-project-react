@@ -275,12 +275,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def check_for_a_duplicate(self, data, variable, text):
         object = self.initial_data.get(variable)
-        if len(object) == constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE:
+        if (len(object)
+                == constants.MIN_NUMBER_OF_TAGS_AND_INGREDIENT_IN_RECIPE):
             return data
         is_duplicate = False
         for el in object:
             if (object.count(el)
-                    > constants.MAX_NUMBER_TO_CHECK_FOR_A_DUPLICATE):
+                    > constants.MIN_NUMBER_OF_TAGS_AND_INGREDIENT_IN_RECIPE):
                 is_duplicate = True
         if is_duplicate:
             raise serializers.ValidationError(
@@ -313,11 +314,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_cooking_time(self, data):
         if data < constants.RECIPE_COOKING_TIME_MIN:
             raise serializers.ValidationError(
-                'Время приготовления не может быть меньше 1 мин.'
+                f'Время приготовления не может быть меньше '
+                f'{constants.RECIPE_COOKING_TIME_MIN} мин.'
             )
         elif data > constants.RECIPE_COOKING_TIME_MAX:
             raise serializers.ValidationError(
-                'Время приготовления не может быть больше 100 мин.'
+                f'Время приготовления не может быть больше '
+                f'{constants.RECIPE_COOKING_TIME_MAX} мин.'
             )
 
         return data

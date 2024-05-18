@@ -1,8 +1,8 @@
 """
 Модели.
 """
-from django.core.validators import MinValueValidator, MaxValueValidator, \
-    RegexValidator
+from django.core.validators import (MinValueValidator, MaxValueValidator,
+                                    RegexValidators)
 from django.db import models
 from django.db.models import UniqueConstraint
 
@@ -163,6 +163,5 @@ class ShoppingCart(FavoriteShoppingCart):
             )
         ]
 
-    @property
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в Список продуктов'

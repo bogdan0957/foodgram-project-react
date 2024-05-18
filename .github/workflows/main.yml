@@ -56,7 +56,6 @@ jobs:
           push: true
           tags: bogdan0957/foodgram_backend:latest
 
-
   deploy:
     runs-on: ubuntu-latest
     needs:
