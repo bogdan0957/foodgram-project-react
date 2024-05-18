@@ -25,19 +25,19 @@
 
 ## Инструкция по запуску сайта: 
 
-1. Для начала склонируйте репозиторий на ваш компьютер 'git@github.com:bogdan0957/foodgram-project-react.git'
-2. Откройте проект, создайте виртуальное окружение. 'python -m venv venv' - для Windows, 'python3 -m venv venv' - для MacOs или Linux.
-3. Активируйте виртуальное окружение. 'source venv/Scripts/activate' - для Windows, 'source venv/Scripts/activate' - для MacOs или Linux.
-4. Обновите pip пакет и установите зависимости. 'python -m pip install --upgrade pip' и 'pip install -r backend/requirements.txt'.
+1. Для начала склонируйте репозиторий на ваш компьютер `git@github.com:bogdan0957/foodgram-project-react.git`
+2. Откройте проект, создайте виртуальное окружение. `python -m venv venv` - для Windows, `python3 -m venv venv` - для MacOs или Linux.
+3. Активируйте виртуальное окружение. `source venv/Scripts/activate` - для Windows, `source venv/Scripts/activate` - для MacOs или Linux.
+4. Обновите pip пакет и установите зависимости. `python -m pip install --upgrade pip` и `pip install -r backend/requirements.txt`.
 5. Создайте в папке /infra файл .env и впишите свои данные по примеру .env.example находящийся в корне проекта.
 6. Зайдите на облачный сервер и создайте директорию под названием foodgram.
 7. Скопируйте все файлы из папки /infra находясь в ней на облачный сервер. Команда для копирования
-   'scp -i path_to_SSH/SSH_name docker-compose.production.yml \
-    username@server_ip:/home/username/foodgram/docker-compose.production.yml'
-   'scp -i path_to_SSH/SSH_name .env \
-    username@server_ip:/home/username/foodgram/.env'
-   ''scp -i path_to_SSH/SSH_name nginx.conf \
-    username@server_ip:/home/username/foodgram/nginx.conf'
+   `scp -i path_to_SSH/SSH_name docker-compose.production.yml \
+    username@server_ip:/home/username/foodgram/docker-compose.production.yml`
+   `scp -i path_to_SSH/SSH_name .env \
+    username@server_ip:/home/username/foodgram/.env`
+   `scp -i path_to_SSH/SSH_name nginx.conf \
+    username@server_ip:/home/username/foodgram/nginx.conf`
 8.  
 
 
