@@ -34,9 +34,21 @@
 7. Скопируйте все файлы из папки /infra находясь в ней на облачный сервер. Команда для копирования \
    `scp -i path_to_SSH/SSH_name docker-compose.production.yml username@server_ip:/home/username/foodgram/docker-compose.production.yml` \
    `scp -i path_to_SSH/SSH_name .env username@server_ip:/home/username/foodgram/.env` \
-   `scp -i path_to_SSH/SSH_name nginx.conf username@server_ip:/home/username/foodgram/nginx.conf` \
-8.  
+   `scp -i path_to_SSH/SSH_name nginx.conf username@server_ip:/home/username/foodgram/nginx.conf` 
+8. Сбилдите образы находясь в папках соответствующим их названию: \
+   `cd backend` -> `docker build -t username/foodgram_backend` -> `docker push username/foodgram_backend` \
+   `cd frontend` -> `docker build -t username/foodgram_frontend` -> `docker push username/foodgram_frontend`
+9. Находясь на сервере перейдите в папку foodgramm и запустите docker-compose.yml командой. \
+   `sudo docker compose -f docker-compose.yml up -d`
+10. Далее когда контейнеры запустяться необходимо прописать ряд команд (для миграции таблиц, заполнения этих таблиц данными и сборка ститики с их последующим копированием. \
+    `sudo docker compose -f docker-compose.yml exec backend python manage.py migrate` \
+    `sudo docker compose -f docker-compose.yml exec backend python manage.py import_db` \
+    `sudo docker compose -f docker-compose.yml exec backend python manage.py import_tag` \
+    `sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic` \
+    `sudo docker compose -f docker-compose.yml exec backend cp -r /app/collected_static/. /static/`.
 
+После того как вы выполнили все команды указанные выше, проект будет доступен по адресу: \
+### `foodgrambogdannug.zapto.org`
 
 
 
