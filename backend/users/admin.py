@@ -4,10 +4,14 @@
 from django.contrib import admin
 
 from users.models import User, Follow
+from django.contrib.auth.models import Group
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+
+admin.site.unregister(Group)
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserOrAdmin(DjangoUserAdmin):
     list_display = ('id',
                     'username',
                     'email',

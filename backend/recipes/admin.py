@@ -2,8 +2,12 @@
 Настройки админ-зоны.
 """
 from django.contrib import admin
-from .models import (Ingredient, Tag, Recipe, IngredientRecipe,
-                     ShoppingCart, Favorite)
+from .models import Tag, Recipe, IngredientRecipe, ShoppingCart, Favorite
+
+
+class IngredientRecipeInline(admin.TabularInline):
+    model = IngredientRecipe
+    extra = 1
 
 
 @admin.register(Recipe)
@@ -11,13 +15,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author')
     list_filter = ('author', 'name', 'tags')
     search_fields = ('name',)
-
-
-@admin.register(Ingredient)
-class IngredientsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit')
-    list_filter = ('measurement_unit',)
-    search_fields = ('name',)
+    inlines = (IngredientRecipeInline,)
 
 
 @admin.register(Tag)
